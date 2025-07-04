@@ -1,0 +1,244 @@
+syntax = "proto3";
+
+package lms;
+
+//test
+message requestPayload{
+    string message=1;
+}
+
+message responsePayload{
+    string message=1;
+}
+
+//status
+message statusResponsePayload{
+    int32 status=1;
+}
+
+//login
+message loginPayload{
+    string username=1;
+    string password=2;
+}
+
+message loginResponsePayload{
+    string token=1;
+    int32 status=2;
+    string role=3;
+}
+
+//logout
+message logoutPayload{
+    string token=1;
+}
+
+//assignment
+message getAssignmentsRequest{
+    string token=1;
+}
+
+message postAssignmentPayload{
+    string assignmentName=1;
+    string filename=2;
+    bytes data=3;
+    string token=4;
+}
+
+message multipleAssignmentResponse{
+    map<string, string> assignments=1;
+    int32 status=2;
+}
+
+message downloadAssignmentRequest{
+    string assignmentId=1;
+    string token=2;
+}
+
+message downloadAssignmentResponse{
+    bytes data=2;
+    string filename=3;
+    int32 status=4;
+}
+
+message submitAssignment{
+    string assignmentId=1;
+    bytes data=2;
+    string filename=3;
+    string token=4;
+}
+
+message getAllSubmissionsRequest{
+    string assignmentId=1;
+    string token=2;
+}
+
+message getAllSubmissionResponse{
+    map<string, string> submissions=1;
+    int32 status=2;
+}
+
+message downloadSubmissionRequest{
+    string studentUsername=1;
+    string assignmentId=2;
+    string token=3;
+}
+
+message downloadSubmissionResponse{
+    string filename=1;
+    bytes data=2;
+    int32 status=3;
+}
+
+message gradeAssignmentRequest{
+    string assignmentId=1;
+    string studentUsername=2;
+    int32 grade=3;
+    string token=4;
+}
+
+message retrieveGradesRequest{
+    string token=1;
+}
+
+message retrieveGradesResponse{
+    map<string, string> grades=1;
+    int32 status=2;
+}
+
+//Query
+message getQueriesRequest{
+    string token=1;
+}
+
+message query {
+  string postedBy = 1;
+  string query = 2;
+  string answer = 3;
+}
+
+message getQueriesResponse {
+  map<string, query> queries = 1;
+  int32 status=2;
+}
+
+message postQueryPayload{
+    string query=1;
+    string token=4;
+}
+
+message answerQueryPayload{
+    string queryId=1;
+    string answer=2;
+    string token=3;
+}
+
+message llmRequest{
+    string question=1;
+    string token=2;
+}
+
+message llmResponse{
+    string answer=1;
+}
+
+//Course materials
+
+message getAllCourseMaterialsRequest{
+    string token=1;
+}
+
+message getAllCourseMaterialsResponse{
+    map<string, string> materials=1;
+    int32 status=2;
+}
+
+message postCourseMaterial{
+    string token=4;
+    string filename=1;
+    string materialName=2;
+    bytes data=3;
+}
+
+message downloadCourseMaterialRequest{
+    string courseMaterialId=1;
+    string token=2;
+}
+
+message downloadCourseMaterialResponse{
+    bytes data=2;
+    string filename=3;
+    int32 status=4;
+}
+
+// RAFT - leader election
+message requestVoteRequest{
+    bytes data=1;
+}
+
+message requestVoteResponse{
+    bool voteGranted=1;
+}
+
+message heartBeatPayload{
+    bytes data=1;
+}
+
+message heartBeatResponse{
+    bytes data=1;
+}
+
+message leaderIdRes{
+    int32 status=2;
+    string leaderId=1;
+}
+
+message llmLogReq{
+    string token=1;
+}
+
+message llmLogRes{
+    int32 status=1;
+    bytes data=2;
+}
+
+
+service LMS{
+    //test
+    rpc get_server_message(requestPayload) returns (responsePayload);
+
+    //Auth
+    rpc login(loginPayload) returns (loginResponsePayload);
+    rpc logout(logoutPayload) returns (statusResponsePayload);
+
+    //Assignment
+    rpc get_assignments(getAssignmentsRequest) returns (multipleAssignmentResponse);
+    rpc post_assignment(postAssignmentPayload) returns (statusResponsePayload);
+    rpc download_assignment(downloadAssignmentRequest) returns (downloadAssignmentResponse);
+    rpc submit_assignment(submitAssignment) returns (statusResponsePayload);
+    rpc get_all_submissions_of_one_assignment(getAllSubmissionsRequest) returns (getAllSubmissionResponse);
+    rpc download_submission(downloadSubmissionRequest) returns (downloadSubmissionResponse);
+    rpc grade_submission(gradeAssignmentRequest) returns (statusResponsePayload);
+    rpc retrieve_grades(retrieveGradesRequest) returns (retrieveGradesResponse);
+
+    //Queries
+    rpc get_queries(getQueriesRequest) returns (getQueriesResponse);
+    rpc post_query(postQueryPayload) returns (statusResponsePayload);
+    rpc answer_query(answerQueryPayload) returns (statusResponsePayload);
+    rpc llm(llmRequest) returns (llmResponse);
+    rpc get_llm_logs(llmLogReq) returns (llmLogRes);
+
+    //Course material
+    rpc get_all_course_materials(getAllCourseMaterialsRequest) returns (getAllCourseMaterialsResponse);
+    rpc post_course_material(postCourseMaterial) returns (statusResponsePayload);
+    rpc download_course_material(downloadCourseMaterialRequest) returns (downloadCourseMaterialResponse);
+
+    //RAFT
+    rpc request_vote(requestVoteRequest) returns (requestVoteResponse);
+    rpc heart_beat(heartBeatPayload) returns (heartBeatResponse);
+    rpc get_leader_id(requestPayload) returns (leaderIdRes);
+}
+
+
+
+
